@@ -1,0 +1,41 @@
+# IDE
+/.idea
+/.awcache
+/.vscode
+/.history
+
+# utils and test
+**/http-client.private.env.json
+
+# docs
+/documentation
+
+# logs
+/wa-log*/
+/wa-data*/
+/wa-cache*/
+*.log
+*.gz
+
+# custom
+/wa-data
+/wa-cache
+
+# local developer config and secrets
+/wa-config-*/secrets/
+/wa-config-*/secrets.yaml
+/wa-config-*/*.custom.php
+/wa-config-*/developer.*.php
+/wa-config-*/services.php
+/wa-config-*/waid.php
+
+# misc
+.files.md5
+build.php
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# macos
+.DS_Store
+
