@@ -1,150 +1,253 @@
-(function() {
-    if (typeof jQuery === 'undefined') {
-        console.error('jQuery не загружен');
-        return;
-    }
+var shopGiftforyouFrontend = (function ($) {
 
-    jQuery(document).ready(function($) {
-        var $spinBtn = $('.js-gift-spin-btn');
-        var $productBlock = $('.js-gift-product');
-        var $productImg = $('.js-gift-product-img');
-        var $productName = $('.js-gift-product-name');
-        var $productPrice = $('.js-gift-product-price');
-        var $productLink = $('.js-gift-product-link');
-        var $productId = $('.js-gift-product-id');
-        var $emailForm = $('.js-gift-email-form');
-        var $message = $('.js-gift-message');
+    shopGiftforyouFrontend = function (options) {
+        var that = this;
 
-        // Проверяем наличие элементов на странице
-        if ($spinBtn.length === 0) {
+        // DOM
+        that.$wrapper = options['$wrapper'] || $(document.body);
+        that.$spinBtn = that.$wrapper.find('.js-gift-spin-btn');
+        that.$productBlock = that.$wrapper.find('.js-gift-product');
+        that.$productImg = that.$wrapper.find('.js-gift-product-img');
+        that.$productName = that.$wrapper.find('.js-gift-product-name');
+        that.$productPrice = that.$wrapper.find('.js-gift-product-price');
+        that.$productLink = that.$wrapper.find('.js-gift-product-link');
+        that.$productId = that.$wrapper.find('.js-gift-product-id');
+        that.$emailForm = that.$wrapper.find('.js-gift-email-form');
+        that.$emailInput = that.$wrapper.find('.js-gift-email');
+        that.$message = that.$wrapper.find('.js-gift-message');
+
+        // VARS
+        that.getGiftUrl = (window.giftforyouUrls && window.giftforyouUrls.getGift) || '/gift/get/';
+        that.sendEmailUrl = (window.giftforyouUrls && window.giftforyouUrls.sendEmail) || '/gift/send/';
+
+        // DYNAMIC VARS
+
+        // INIT
+        if (that.$spinBtn.length === 0) {
             console.log('Элементы плагина gift_for_You не найдены на странице');
             return;
         }
 
-        // Получаем URL для AJAX запросов из переменной, переданной из шаблона
-        var getGiftUrl = (window.giftforyouUrls && window.giftforyouUrls.getGift) || '/gift/get/';
-        var sendEmailUrl = (window.giftforyouUrls && window.giftforyouUrls.sendEmail) || '/gift/send/';
-
         console.log('Giftforyou plugin initialized');
-        console.log('Gift URLs:', {getGiftUrl: getGiftUrl, sendEmailUrl: sendEmailUrl});
-        console.log('Button found:', $spinBtn.length > 0);
+        console.log('Gift URLs:', {getGiftUrl: that.getGiftUrl, sendEmailUrl: that.sendEmailUrl});
+        console.log('Button found:', that.$spinBtn.length > 0);
 
-        // Обработка клика на кнопку "Крутить"
-        $spinBtn.on('click', function(e) {
+        that.initClass();
+    };
+
+    shopGiftforyouFrontend.prototype.initClass = function () {
+        var that = this;
+
+        that.initSpin();
+        that.initEmailForm();
+    };
+
+    shopGiftforyouFrontend.prototype.initSpin = function () {
+        var that = this;
+
+        that.$spinBtn.on('click', function (e) {
             e.preventDefault();
             console.log('Кнопка "Крутить" нажата');
+
             var $btn = $(this);
             $btn.prop('disabled', true).text('Загрузка...');
-            $productBlock.hide();
-            $message.hide();
+            that.$productBlock.hide();
+            that.$message.hide();
 
-            console.log('Отправка AJAX запроса на:', getGiftUrl);
+            console.log('Отправка AJAX запроса на:', that.getGiftUrl);
 
-            // AJAX запрос для получения случайного товара
-            $.ajax({
-                url: getGiftUrl,
-                type: 'POST',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'ok' && response.data) {
-                        var product = response.data;
-
-                        // Заполняем данные товара
-                        if (product.image) {
-                            $productImg.attr('src', product.image).attr('alt', product.name);
-                        }
-                        $productName.text(product.name);
-                        $productPrice.text('Цена: ' + product.price);
-                        $productLink.attr('href', product.url);
-                        $productId.val(product.id);
-
-                        // Показываем блок с товаром
-                        $productBlock.slideDown();
-                    } else {
-                        showMessage('Ошибка: ' + (response.errors || 'Не удалось получить товар'), 'error');
-                    }
-                    $btn.prop('disabled', false).text('Крутить');
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX ошибка:', status, error, xhr);
-                    var errorMsg = 'Ошибка при загрузке товара. Попробуйте еще раз.';
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        errorMsg = xhr.responseJSON.errors;
-                    }
-                    showMessage(errorMsg, 'error');
-                    $btn.prop('disabled', false).text('Крутить');
-                }
-            });
+            that.getGift($btn);
         });
+    };
 
-    // Обработка отправки формы email
-    $emailForm.on('submit', function(e) {
-        e.preventDefault();
+    shopGiftforyouFrontend.prototype.initEmailForm = function () {
+        var that = this;
 
-        var email = $('.js-gift-email').val();
-        var productId = $productId.val();
+        that.$emailForm.on('submit', function (e) {
+            e.preventDefault();
 
-        if (!email) {
-            showMessage('Пожалуйста, введите email', 'error');
-            return;
-        }
+            var email = that.$emailInput.val();
+            var productId = that.$productId.val();
 
-        if (!productId) {
-            showMessage('Ошибка: товар не выбран', 'error');
-            return;
-        }
+            if (!email) {
+                that.showMessage('Пожалуйста, введите email', 'error');
+                return;
+            }
 
-        var $submitBtn = $(this).find('button[type="submit"]');
-        $submitBtn.prop('disabled', true).text('Отправка...');
-        $message.hide();
+            if (!productId) {
+                that.showMessage('Ошибка: товар не выбран', 'error');
+                return;
+            }
 
-        // AJAX запрос для отправки письма
+            var $submitBtn = $(this).find('button[type="submit"]');
+            $submitBtn.prop('disabled', true).text('Отправка...');
+            that.$message.hide();
+
+            that.sendEmail(email, productId, $submitBtn);
+        });
+    };
+
+    shopGiftforyouFrontend.prototype.getGift = function ($btn) {
+        var that = this;
+
         $.ajax({
-            url: sendEmailUrl,
+            url: that.getGiftUrl,
+            type: 'POST',
+            dataType: 'json',
+            success: function (response) {
+                console.log('AJAX успешный ответ:', response);
+
+                if (response.status === 'fail') {
+                    var errorMsg = that.parseError(response.errors, 'Не удалось получить товар');
+                    console.log('Ошибка от сервера:', errorMsg);
+                    that.showMessage(errorMsg, 'error');
+                    $btn.prop('disabled', false).text('Крутить');
+                    return;
+                }
+
+                if (response.status === 'ok' && response.data) {
+                    var product = response.data;
+
+                    if (product.image) {
+                        that.$productImg.attr('src', product.image).attr('alt', product.name);
+                    }
+                    that.$productName.text(product.name);
+                    that.$productPrice.text('Цена: ' + product.price);
+                    that.$productLink.attr('href', product.url);
+                    that.$productId.val(product.id);
+
+                    that.$productBlock.slideDown();
+                } else {
+                    var errorMsg = 'Не удалось получить товар. Неожиданный формат ответа.';
+                    console.warn('Неожиданный формат ответа:', response);
+                    that.showMessage(errorMsg, 'error');
+                }
+                $btn.prop('disabled', false).text('Крутить');
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX ошибка:', status, error, xhr);
+                var errorMsg = 'Ошибка при загрузке товара. Попробуйте еще раз.';
+
+                if (xhr.responseJSON) {
+                    if (xhr.responseJSON.errors) {
+                        errorMsg = that.parseError(xhr.responseJSON.errors, errorMsg);
+                    } else if (xhr.responseJSON.status === 'fail') {
+                        errorMsg = xhr.responseJSON.errors || errorMsg;
+                    }
+                }
+
+                that.showMessage(errorMsg, 'error');
+                $btn.prop('disabled', false).text('Крутить');
+            }
+        });
+    };
+
+    shopGiftforyouFrontend.prototype.sendEmail = function (email, productId, $submitBtn) {
+        var that = this;
+
+        $.ajax({
+            url: that.sendEmailUrl,
             type: 'POST',
             data: {
                 email: email,
                 product_id: productId
             },
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
+                console.log('AJAX успешный ответ (email):', response);
+
+                if (response.status === 'fail') {
+                    var errorMsg = that.parseError(response.errors, 'Не удалось отправить письмо');
+                    console.log('Ошибка от сервера (email):', errorMsg);
+                    that.showMessage(errorMsg, 'error');
+                    $submitBtn.prop('disabled', false).text('Отправить');
+                    return;
+                }
+
                 if (response.status === 'ok') {
-                    showMessage('Письмо успешно отправлено на ' + email, 'success');
-                    $('.js-gift-email').val('');
+                    that.showMessage('Письмо успешно отправлено на ' + email, 'success');
+                    that.$emailInput.val('');
                 } else {
-                    showMessage('Ошибка: ' + (response.errors || 'Не удалось отправить письмо'), 'error');
+                    var errorMsg = 'Не удалось отправить письмо. Неожиданный формат ответа.';
+                    console.warn('Неожиданный формат ответа (email):', response);
+                    that.showMessage(errorMsg, 'error');
                 }
                 $submitBtn.prop('disabled', false).text('Отправить');
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('AJAX ошибка:', status, error, xhr);
                 var errorMsg = 'Ошибка при отправке письма. Попробуйте еще раз.';
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    errorMsg = xhr.responseJSON.errors;
+
+                if (xhr.responseJSON) {
+                    if (xhr.responseJSON.errors) {
+                        errorMsg = that.parseError(xhr.responseJSON.errors, errorMsg);
+                    } else if (xhr.responseJSON.status === 'fail') {
+                        errorMsg = xhr.responseJSON.errors || errorMsg;
+                    }
                 }
-                showMessage(errorMsg, 'error');
+
+                that.showMessage(errorMsg, 'error');
                 $submitBtn.prop('disabled', false).text('Отправить');
             }
         });
-    });
+    };
 
-    // Функция для отображения сообщений
-    function showMessage(text, type) {
-        if ($message.length === 0) {
+    shopGiftforyouFrontend.prototype.parseError = function (errors, defaultMsg) {
+        if (!errors) {
+            return defaultMsg;
+        }
+
+        if (typeof errors === 'string') {
+            return errors;
+        } else if (Array.isArray(errors)) {
+            return errors.join(', ');
+        } else if (typeof errors === 'object') {
+            // Если это объект с полем message
+            if (errors.message) {
+                return errors.message;
+            }
+            // Если это массив объектов с полем message
+            if (Array.isArray(errors) && errors[0] && errors[0].message) {
+                return errors[0].message;
+            }
+            return JSON.stringify(errors);
+        }
+
+        return defaultMsg;
+    };
+
+    shopGiftforyouFrontend.prototype.showMessage = function (text, type) {
+        var that = this;
+
+        console.log('showMessage вызвана:', text, type);
+
+        if (that.$message.length === 0) {
+            console.error('Элемент сообщения не найден!');
             console.log('Сообщение:', text);
             return;
         }
-        $message
+
+        that.$message
             .removeClass('success error')
             .addClass(type)
             .text(text)
-            .slideDown();
+            .show();
 
-        // Автоматически скрыть сообщение через 5 секунд
-        setTimeout(function() {
-            $message.slideUp();
+        setTimeout(function () {
+            that.$message.slideUp();
         }, 5000);
-    }
-    });
-})();
+    };
 
+    return shopGiftforyouFrontend;
+})(jQuery);
+
+jQuery(document).ready(function ($) {
+    if (typeof jQuery === 'undefined') {
+        console.error('jQuery не загружен');
+        return;
+    }
+
+    new shopGiftforyouFrontend({
+        $wrapper: $(document.body)
+    });
+});

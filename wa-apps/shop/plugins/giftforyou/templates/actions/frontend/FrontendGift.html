@@ -9,6 +9,8 @@
         </button>
     </div>
 
+    <div class="gift-message js-gift-message" style="display: none;"></div>
+
     <script>
         window.giftforyouUrls = {
             getGift: '{$get_gift_url|default:"/gift/get/"}',
@@ -46,7 +48,6 @@
                     [`Отправить`]
                 </button>
             </form>
-            <div class="gift-message js-gift-message" style="display: none;"></div>
         </div>
     </div>
 </div>
@@ -67,6 +68,14 @@
 
 .gift-spinner {
     margin: 40px 0;
+}
+
+.gift-message {
+    margin: 20px auto;
+    max-width: 600px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
 }
 
 .gift-btn {
@@ -163,12 +172,6 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     box-sizing: border-box;
-}
-
-.gift-message {
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 5px;
 }
 
 .gift-message.success {
