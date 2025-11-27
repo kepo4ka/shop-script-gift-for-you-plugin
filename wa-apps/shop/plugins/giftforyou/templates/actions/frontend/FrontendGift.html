@@ -1,0 +1,186 @@
+<div class="gift-page">
+    <h1>
+        [`Подарок для вас!`]
+    </h1>
+
+    <div class="gift-spinner">
+        <button class="gift-btn js-gift-spin-btn">
+            [`Крутить`]
+        </button>
+    </div>
+
+    <script>
+        window.giftforyouUrls = {
+            getGift: '{$get_gift_url|default:"/gift/get/"}',
+            sendEmail: '{$send_email_url|default:"/gift/send/"}'
+        };
+    </script>
+
+    <div class="gift-product js-gift-product" style="display: none;">
+        <div class="gift-product-card">
+            <div class="gift-product-image">
+                <img class="js-gift-product-img" src="" alt="">
+            </div>
+            <div class="gift-product-info">
+                <h2 class="js-gift-product-name"></h2>
+                <div class="gift-product-price js-gift-product-price"></div>
+                <a class="gift-product-url js-gift-product-link" href="" target='_blank'>
+                    [`Посмотреть товар`]
+                </a>
+            </div>
+        </div>
+
+        <div class="gift-email-form">
+            <h3>
+                [`Получить информацию о подарке на email`]
+            </h3>
+            <form class="js-gift-email-form">
+                <input type="hidden" class="js-gift-product-id" name="product_id" value="">
+                <div class="gift-form-group">
+                    <label>
+                        [`Ваш email:`]
+                    </label>
+                    <input type="email" class="js-gift-email" name="email" required placeholder="example@mail.com">
+                </div>
+                <button type="submit" class="gift-btn">
+                    [`Отправить`]
+                </button>
+            </form>
+            <div class="gift-message js-gift-message" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+.gift-page {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.gift-page h1 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.gift-spinner {
+    margin: 40px 0;
+}
+
+.gift-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 40px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.gift-btn:hover {
+    background-color: #45a049;
+}
+
+.gift-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.gift-product {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+.gift-product-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.gift-product-image img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 5px;
+}
+
+.gift-product-info {
+    text-align: left;
+}
+
+.gift-product-info h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.gift-product-price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 15px;
+}
+
+.gift-email-form {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+}
+
+.gift-email-form h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.gift-form-group {
+    margin-bottom: 20px;
+}
+
+.gift-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.gift-form-group input {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.gift-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.gift-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.gift-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+</style>
+
