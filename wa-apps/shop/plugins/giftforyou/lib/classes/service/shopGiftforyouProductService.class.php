@@ -73,7 +73,7 @@ class shopGiftforyouProductService
 
         $product_url = wa()->getRouteUrl('shop/frontend/product', array('product_url' => $product['url']));
 
-        $price = shop_currency($product['price'], $product['currency'], null, false);
+        $price = shop_currency($product['price'], $product['currency'], null, true);
 
         return [
             'id'          => $product['id'],

@@ -2,7 +2,7 @@
 
 class shopGiftforyouPluginFrontendGetgiftController extends waJsonController
 {
-    private ?shopGiftforyouProductService $productService;
+    private ?shopGiftforyouProductService $productService = null;
 
     /**
      * @throws waException
@@ -94,7 +94,7 @@ class shopGiftforyouPluginFrontendGetgiftController extends waJsonController
      *
      * @return shopGiftforyouProductService
      */
-    protected function getProductService()
+    protected function getProductService(): shopGiftforyouProductService
     {
         if (null === $this->productService) {
             $this->productService = new shopGiftforyouProductService();

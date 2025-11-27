@@ -2,7 +2,7 @@
 
 class shopGiftforyouPluginFrontendSendemailController extends waJsonController
 {
-    protected ?shopGiftforyouProductService $productService;
+    protected ?shopGiftforyouProductService $productService = null;
 
     public function execute()
     {
@@ -97,7 +97,7 @@ class shopGiftforyouPluginFrontendSendemailController extends waJsonController
         }
     }
 
-    protected function getProductService()
+    protected function getProductService(): shopGiftforyouProductService
     {
         if (null === $this->productService) {
             $this->productService = new shopGiftforyouProductService();
